@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 using namespace std;
 
@@ -20,8 +21,9 @@ class rocket {
     int index;
     int map[s][s];
     int score = 1000;
-    // int movesTakenToReachMin = 0;
-    // int minDist = 1000;
+    int movesTakenToReachMin = 0;
+    int minDist = 1000;
+    bool isGodParent = false;
     rocket(vector<std::string> d, int m[s][s]) {
         x = s/2;
         y = s-1;
@@ -32,7 +34,8 @@ class rocket {
         memcpy(map, m, s*s*sizeof(s));
     }
 
-    void move() {
+    void move(std::pair<int,int> target) {
+        if(isGodParent) return;
         lx = x;
         ly = y;
         if(index >= directions.size()) {
@@ -46,6 +49,14 @@ class rocket {
         } else if(directions.at(index) == "L" && map[y][x-1] != 1) {
             x--;
         }
+        // int dist = (sqrt(pow(x - target.second, 2) + pow(y - target.first, 2)));
+        // if(minDist > dist) {
+        //     minDist = dist;
+        //     movesTakenToReachMin = index;
+        // }
+        // if(dist == 0) {
+        //     isGodParent = true;
+        // }
         index++;
     }
 

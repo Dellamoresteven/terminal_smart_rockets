@@ -1,3 +1,4 @@
+// g++ --std=c++17 -o run main.cpp rocket.cpp && ./run
 #include <stdlib.h>
 #include <iostream>
 #include <cstdlib>
@@ -10,12 +11,12 @@
 
 using namespace std;
 // PARAMS TO CHANGE
-constexpr int moves = 200;
-constexpr int numRockets = 500;
+constexpr int moves = 400;
+constexpr int numRockets = 100;
 const std::pair<int,int> targetLoc = std::pair(4,4);
-constexpr double percentTake = .1;
-constexpr double mutationRate = .1;
-constexpr double numGames = 50;
+constexpr double percentTake = .2;
+constexpr double mutationRate = .05;
+constexpr double numGames = 1000;
 // END
 
 #define s 50
@@ -58,10 +59,12 @@ int main() {
             if(show) usleep(1000 * 1000 * .01);
             for(int i = 0; i < r.size(); i++) {
                 rocket * r1 = r.at(i);
-                r1->move();
-                map[r1->y][r1->x] = 2;
-                if(!(r1->y == r1->ly) || !(r1->x == r1->lx)){
-                    map[r1->ly][r1->lx] = 0;
+                if(!r1->isGodParent) {
+                    r1->move(targetLoc);
+                    map[r1->y][r1->x] = 2;
+                    if(!(r1->y == r1->ly) || !(r1->x == r1->lx)){
+                        map[r1->ly][r1->lx] = 0;
+                    }
                 }
                 if(r1->index == moves){
                     gameOver = true;
@@ -124,8 +127,16 @@ vector<rocket*> newGeneration(vector<rocket*> r) {
     };
     int numTake = r.size() * percentTake;
     sort(r.begin(), r.end(), [](auto r1, auto r2){
+        if(r2->isGodParent) {
+            return true;
+        }
         return r1->score < r2->score;
     });
+
+    // for(auto x : r) {
+    //     cout << x->score << endl;
+    // }
+
     for(int i = 0; i < r.size(); i++) {
         double rm2 = rand() % 100/100.0;
         int r1 = rand() % numTake;
@@ -133,7 +144,7 @@ vector<rocket*> newGeneration(vector<rocket*> r) {
         rocket * p1 = r.at(rand() % numTake);
         rocket * p2 = r.at(rand() % numTake);
         vector<std::string> newDNA;
-        for(int i = 0; i < moves/2; i++) {
+        for(int j = 0; j < moves/2; j++) {
             double rm = rand() % 100/100.0;
             if(rm < mutationRate) {
                 int r = rand() % 4;
@@ -147,11 +158,11 @@ vector<rocket*> newGeneration(vector<rocket*> r) {
                     newDNA.push_back("N");
                 }
             } else {
-                newDNA.push_back(p1->directions.at(i));
+                newDNA.push_back(p1->directions.at(j));
             }
         }
 
-        for(int i = newDNA.size(); i < moves; i++) {
+        for(int j = newDNA.size(); j < moves; j++) {
             double rm = rand() % 100/100.0;
             if(rm < mutationRate) {
                 int r = rand() % 4;
@@ -165,16 +176,18 @@ vector<rocket*> newGeneration(vector<rocket*> r) {
                     newDNA.push_back("N");
                 }
             } else {
-                newDNA.push_back(p2->directions.at(i));
+                newDNA.push_back(p2->directions.at(j));
             }
         }
-        if(rm2 < mutationRate) {
-            nr.push_back( new rocket(randDir(), map) );
-        } else {
+        // if(rm2 < mutationRate) { // Brand new Random DNA
+        //     nr.push_back( new rocket(randDir(), map) );
+        // } else {
             nr.push_back( new rocket(newDNA, map) );
-        }
+        // }
 
     }
+
+    // deleteteteette
     for ( int i = 0; i < r.size(); i++) {
         delete r[i];
     }
@@ -198,8 +211,27 @@ void initMap() {
     }
 
     for(int i = 0; i < s; i++) {
+        if(i != 25) {
+            map[15][i] = 1;
+        }
+    }
+
+    for(int i = 0; i < s; i++) {
+        if(i != 45) {
+            map[10][i] = 1;
+        }
+    }
+
+
+    for(int i = 0; i < s; i++) {
         if(i != 3 && i != 35) {
             map[35][i] = 1;
+        }
+    }
+
+    for(int i = 0; i < s; i++) {
+        if(!(i>20 && i < 28)) {
+            map[27][i] = 1;
         }
     }
     map[targetLoc.first][targetLoc.second] = 3;
