@@ -23,7 +23,7 @@ class rocket {
     int score = 1000;
     int movesTakenToReachMin = 0;
     int minDist = 1000;
-    bool isGodParent = false;
+    bool gotToTarget = false;
     rocket(vector<std::string> d, int m[s][s]) {
         x = s/2;
         y = s-1;
@@ -35,7 +35,7 @@ class rocket {
     }
 
     void move(std::pair<int,int> target) {
-        if(isGodParent) return;
+        if(gotToTarget) return;
         lx = x;
         ly = y;
         if(index >= directions.size()) {
@@ -48,15 +48,14 @@ class rocket {
             x++;
         } else if(directions.at(index) == "L" && map[y][x-1] != 1) {
             x--;
+        } else if(directions.at(index) == "D" && y+1 < s && map[y+1][x] != 1) {
+            // y++;
         }
-        // int dist = (sqrt(pow(x - target.second, 2) + pow(y - target.first, 2)));
-        // if(minDist > dist) {
-        //     minDist = dist;
-        //     movesTakenToReachMin = index;
-        // }
-        // if(dist == 0) {
-        //     isGodParent = true;
-        // }
+        int dist = (sqrt(pow(x - target.second, 2) + pow(y - target.first, 2)));
+
+        if(dist == 0) {
+            gotToTarget = true;
+        }
         index++;
     }
 
